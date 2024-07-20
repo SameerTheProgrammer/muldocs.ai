@@ -8,7 +8,7 @@ config({
 
 export const env = cleanEnv(process.env, {
     PORT: port(),
-    NODE_ENV: str({ default: "dev", choices: ["test", "prod", "dev"] }),
+    NODE_ENV: str({ default: "dev", choices: ["prod", "dev"] }),
 });
 
 export default env;
