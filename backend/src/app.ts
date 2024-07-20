@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import express, { NextFunction, Request, Response } from "express";
 import createHttpError, { HttpError } from "http-errors";
 import cors from "cors";
@@ -26,7 +27,7 @@ app.use(sanitize());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
 app.get("/", (req: Request, res: Response) => {
-    res.send("Welcome to take-home-challenge site");
+    res.send("Welcome to PdfAiChat site");
 });
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/require-await
