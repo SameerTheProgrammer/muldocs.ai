@@ -2,6 +2,7 @@ import { Repository } from "typeorm";
 import { User } from "../entity/User";
 import { IUserData } from "../types/auth.types";
 import createHttpError from "http-errors";
+import bcrypt from "bcryptjs";
 
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
@@ -14,15 +15,17 @@ export class UserService {
                 400,
                 "Email is already exists. Try with different email",
             );
-            console.log(user);
             throw error;
         }
+
+        const saltRound = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRound);
 
         try {
             const data = this.userRepository.create({
                 name,
                 email,
-                password,
+                password: hashedPassword,
             });
             return await this.userRepository.save(data);
         } catch (error) {
