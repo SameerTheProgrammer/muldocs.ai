@@ -2,6 +2,7 @@ import { NextFunction, Response } from "express";
 import { IUserRegisterRequest } from "../types/auth.types";
 import { Logger } from "winston";
 import { UserService } from "../service/User.Service";
+import { setCookie } from "../utils/cookie";
 
 export class AuthController {
     constructor(
@@ -29,6 +30,8 @@ export class AuthController {
             });
 
             this.logger.info("User has been registered", { id: newUser.id });
+
+            setCookie(res, newUser.id);
             res.status(201).json({ id: newUser.id });
         } catch (error) {
             return next(error);
