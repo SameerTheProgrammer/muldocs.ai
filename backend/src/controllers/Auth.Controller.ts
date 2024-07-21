@@ -29,7 +29,7 @@ export class AuthController {
             });
 
             this.logger.info("User has been registered", { id: newUser.id });
-            res.status(201).json({ newUser });
+            res.status(201).json({ id: newUser.id });
         } catch (error) {
             return next(error);
         }
