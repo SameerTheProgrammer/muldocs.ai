@@ -48,7 +48,7 @@ export class UserService {
     async findByEmail(email: string) {
         return await this.userRepository.findOne({
             where: {
-                email,
+                email: email.toLowerCase(),
             },
         });
     }
@@ -56,7 +56,7 @@ export class UserService {
     async findByEmailWithPassword(email: string) {
         return await this.userRepository.findOne({
             where: {
-                email,
+                email: email.toLowerCase(),
             },
             select: ["id", "name", "email", "password"],
         });
