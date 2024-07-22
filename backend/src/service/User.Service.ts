@@ -7,7 +7,15 @@ import bcrypt from "bcryptjs";
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
 
-    async create({ name, email, password }: IUserData) {
+    async create({ name, email, password, cpassword }: IUserData) {
+        if (cpassword !== password) {
+            const error = createHttpError(
+                400,
+                "Confirm password should match with Password",
+            );
+            throw error;
+        }
+
         // check is email is already registered or not
         const user = await this.userRepository.findOne({ where: { email } });
         if (user) {

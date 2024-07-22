@@ -16,7 +16,7 @@ export class AuthController {
         next: NextFunction,
     ) {
         try {
-            const { name, email, password } = req.body;
+            const { name, email, password, cpassword } = req.body;
             this.logger.info("New request to register a user", {
                 name,
                 email,
@@ -27,6 +27,7 @@ export class AuthController {
                 name,
                 email,
                 password,
+                cpassword,
             });
 
             this.logger.info("User has been registered", { id: newUser.id });
