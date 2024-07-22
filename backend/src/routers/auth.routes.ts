@@ -9,7 +9,7 @@ import { UserService } from "./../service/User.Service";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entity/User";
 import logger from "./../config/logger";
-import { IUserRegisterRequest } from "../types/auth.types";
+import { IUserLoginRequest, IUserRegisterRequest } from "../types/auth.types";
 
 const router = express.Router();
 
@@ -24,6 +24,16 @@ router
     .post((req: Request, res: Response, next: NextFunction) => {
         authController.register(
             req as IUserRegisterRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler;
+    });
+
+router
+    .route("/login")
+    .post((req: Request, res: Response, next: NextFunction) => {
+        authController.login(
+            req as IUserLoginRequest,
             res,
             next,
         ) as unknown as RequestHandler;

@@ -1,8 +1,10 @@
 import { NextFunction, Response } from "express";
-import { IUserRegisterRequest } from "../types/auth.types";
+import { IUserLoginRequest, IUserRegisterRequest } from "../types/auth.types";
 import { Logger } from "winston";
 import { UserService } from "../service/User.Service";
 import { setCookie } from "../utils/cookie";
+import createHttpError from "http-errors";
+import bcrypt from "bcryptjs";
 
 export class AuthController {
     constructor(
@@ -34,6 +36,40 @@ export class AuthController {
 
             setCookie(res, newUser.id);
             res.status(201).json({ id: newUser.id });
+        } catch (error) {
+            return next(error);
+        }
+    }
+
+    async login(req: IUserLoginRequest, res: Response, next: NextFunction) {
+        try {
+            const { email, password } = req.body;
+            this.logger.info("New request to Login a user", {
+                email,
+                password: "****",
+            });
+
+            // check is email is registered or not
+            const user = await this.UserService.findByEmailWithPassword(email);
+            if (!user) {
+                const error = createHttpError(400, "Invalid credentials");
+                return next(error);
+            }
+
+            const isCorrectPassword = await bcrypt.compare(
+                password,
+                user.password,
+            );
+
+            if (!isCorrectPassword) {
+                const error = createHttpError(400, "Invalid credentials");
+                return next(error);
+            }
+
+            this.logger.info("User has been LoggedIn", { id: user.id });
+
+            setCookie(res, user.id);
+            res.status(200).json({ id: user.id });
         } catch (error) {
             return next(error);
         }

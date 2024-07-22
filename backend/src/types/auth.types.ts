@@ -10,3 +10,12 @@ export interface IUserData {
 export interface IUserRegisterRequest extends Request {
     body: IUserData;
 }
+
+export interface ILoginUserData {
+    email: string;
+    password: string;
+}
+
+export interface IUserLoginRequest extends Request {
+    body: ILoginUserData;
+}
