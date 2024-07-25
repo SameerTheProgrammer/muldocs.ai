@@ -9,6 +9,7 @@ import { UserService } from "../service/User.Service";
 import { setCookie } from "../utils/cookie";
 import createHttpError from "http-errors";
 import bcrypt from "bcryptjs";
+import { validationResult } from "express-validator";
 
 export class AuthController {
     constructor(
@@ -22,6 +23,13 @@ export class AuthController {
         next: NextFunction,
     ) {
         try {
+            const result = validationResult(req);
+            if (!result.isEmpty()) {
+                return res.status(400).json({
+                    errors: result.array(),
+                });
+            }
+
             const { name, email, password, cpassword } = req.body;
             this.logger.info("New request to register a user", {
                 name,
@@ -47,6 +55,12 @@ export class AuthController {
 
     async login(req: IUserLoginRequest, res: Response, next: NextFunction) {
         try {
+            const result = validationResult(req);
+            if (!result.isEmpty()) {
+                return res.status(400).json({
+                    errors: result.array(),
+                });
+            }
             const { email, password } = req.body;
             this.logger.info("New request to Login a user", {
                 email,
@@ -85,6 +99,13 @@ export class AuthController {
         next: NextFunction,
     ) {
         try {
+            const result = validationResult(req);
+            if (!result.isEmpty()) {
+                return res.status(400).json({
+                    errors: result.array(),
+                });
+            }
+
             const { oldPassword, newPassword, cpassword } = req.body;
             const userId = req.params.id;
             this.logger.info("New request to change the password", {

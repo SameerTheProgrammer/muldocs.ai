@@ -14,6 +14,11 @@ import {
     IUserLoginRequest,
     IUserRegisterRequest,
 } from "../types/auth.types";
+import {
+    loginValidation,
+    newPasswordValidation,
+    registerValidation,
+} from "../validators/auth.validator";
 
 const router = express.Router();
 
@@ -25,32 +30,41 @@ const authController = new AuthController(userService, logger);
 
 router
     .route("/register")
-    .post((req: Request, res: Response, next: NextFunction) => {
-        authController.register(
-            req as IUserRegisterRequest,
-            res,
-            next,
-        ) as unknown as RequestHandler;
-    });
+    .post(
+        registerValidation,
+        (req: Request, res: Response, next: NextFunction) => {
+            authController.register(
+                req as IUserRegisterRequest,
+                res,
+                next,
+            ) as unknown as RequestHandler;
+        },
+    );
 
 router
     .route("/login")
-    .post((req: Request, res: Response, next: NextFunction) => {
-        authController.login(
-            req as IUserLoginRequest,
-            res,
-            next,
-        ) as unknown as RequestHandler;
-    });
+    .post(
+        loginValidation,
+        (req: Request, res: Response, next: NextFunction) => {
+            authController.login(
+                req as IUserLoginRequest,
+                res,
+                next,
+            ) as unknown as RequestHandler;
+        },
+    );
 
 router
     .route("/newPassword/:id")
-    .post((req: Request, res: Response, next: NextFunction) => {
-        authController.newPassword(
-            req as INewPasswordRequest,
-            res,
-            next,
-        ) as unknown as RequestHandler;
-    });
+    .post(
+        newPasswordValidation,
+        (req: Request, res: Response, next: NextFunction) => {
+            authController.newPassword(
+                req as INewPasswordRequest,
+                res,
+                next,
+            ) as unknown as RequestHandler;
+        },
+    );
 
 export default router;
