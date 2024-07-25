@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
 import { User } from "../entity/User";
-import { IUserData } from "../types/auth.types";
+import { IUpdatePasswordData, IUserData } from "../types/auth.types";
 import createHttpError from "http-errors";
 import bcrypt from "bcryptjs";
 
@@ -64,5 +64,44 @@ export class UserService {
             },
             select: ["id", "name", "email", "password"],
         });
+    }
+
+    async findByIdWithPassword(id: string) {
+        return await this.userRepository.findOne({
+            where: { id },
+            select: ["password"],
+        });
+    }
+
+    async updatePassword({ newPassword, id, email }: IUpdatePasswordData) {
+        let user;
+        if (id) {
+            user = await this.userRepository.findOne({
+                where: { id },
+            });
+        } else {
+            user = await this.userRepository.findOne({
+                where: { email },
+            });
+        }
+
+        if (!user) {
+            const error = createHttpError(400, "Invalid user id");
+            throw error;
+        }
+
+        const saltRound = 10;
+        const hashedPassword = await bcrypt.hash(newPassword, saltRound);
+
+        try {
+            user.password = hashedPassword;
+            return this.userRepository.save(user);
+        } catch (error) {
+            const err = createHttpError(
+                400,
+                "Faced error while saving new password",
+            );
+            throw err;
+        }
     }
 }

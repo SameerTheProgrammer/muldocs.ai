@@ -1,5 +1,9 @@
 import { NextFunction, Response } from "express";
-import { IUserLoginRequest, IUserRegisterRequest } from "../types/auth.types";
+import {
+    INewPasswordRequest,
+    IUserLoginRequest,
+    IUserRegisterRequest,
+} from "../types/auth.types";
 import { Logger } from "winston";
 import { UserService } from "../service/User.Service";
 import { setCookie } from "../utils/cookie";
@@ -70,6 +74,51 @@ export class AuthController {
 
             setCookie(res, user.id);
             res.status(200).json({ id: user.id });
+        } catch (error) {
+            return next(error);
+        }
+    }
+
+    async newPassword(
+        req: INewPasswordRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        try {
+            const { oldPassword, newPassword, cpassword } = req.body;
+            const userId = req.params.id;
+            this.logger.info("New request to change the password", {
+                userId,
+            });
+
+            if (cpassword !== newPassword) {
+                const error = createHttpError(
+                    400,
+                    "Confirm password should match with new Password",
+                );
+                throw error;
+            }
+
+            const user = await this.UserService.findByIdWithPassword(userId);
+            if (!user) {
+                const error = createHttpError(400, "Invalid user id");
+                return next(error);
+            }
+
+            const isCorrectPassword = await bcrypt.compare(
+                oldPassword,
+                user.password,
+            );
+
+            if (!isCorrectPassword) {
+                const error = createHttpError(400, "Invalid credentials");
+                return next(error);
+            }
+
+            await this.UserService.updatePassword({ newPassword, id: userId });
+
+            this.logger.info("Password has been Updated", { id: userId });
+            res.status(201).json({ id: userId });
         } catch (error) {
             return next(error);
         }

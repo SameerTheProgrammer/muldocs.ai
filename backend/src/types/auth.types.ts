@@ -19,3 +19,16 @@ export interface ILoginUserData {
 export interface IUserLoginRequest extends Request {
     body: ILoginUserData;
 }
+
+export interface IUpdatePasswordData {
+    newPassword: string;
+    id?: string;
+    email?: string;
+}
+
+export interface INewPasswordRequest extends Request {
+    body: { oldPassword: string; newPassword: string; cpassword: string };
+    params: {
+        id: string;
+    };
+}

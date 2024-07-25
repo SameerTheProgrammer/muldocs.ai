@@ -9,7 +9,11 @@ import { UserService } from "./../service/User.Service";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entity/User";
 import logger from "./../config/logger";
-import { IUserLoginRequest, IUserRegisterRequest } from "../types/auth.types";
+import {
+    INewPasswordRequest,
+    IUserLoginRequest,
+    IUserRegisterRequest,
+} from "../types/auth.types";
 
 const router = express.Router();
 
@@ -34,6 +38,16 @@ router
     .post((req: Request, res: Response, next: NextFunction) => {
         authController.login(
             req as IUserLoginRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler;
+    });
+
+router
+    .route("/newPassword/:id")
+    .post((req: Request, res: Response, next: NextFunction) => {
+        authController.newPassword(
+            req as INewPasswordRequest,
             res,
             next,
         ) as unknown as RequestHandler;
