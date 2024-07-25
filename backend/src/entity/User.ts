@@ -4,9 +4,11 @@ import {
     Column,
     BeforeUpdate,
     BeforeInsert,
+    OneToMany,
 } from "typeorm";
 import { IsEmail, Length, MinLength, validate } from "class-validator";
 import createHttpError from "http-errors";
+import { Folder } from "./Folder";
 
 @Entity()
 export class User {
@@ -33,6 +35,9 @@ export class User {
     })
     @Column({ select: false })
     password: string;
+
+    @OneToMany(() => Folder, (folder) => folder.user)
+    folders: Folder[];
 
     @BeforeInsert()
     @BeforeUpdate()
