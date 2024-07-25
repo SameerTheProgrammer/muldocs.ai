@@ -1,8 +1,9 @@
-import { PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { PrimaryGeneratedColumn, Column, ManyToOne, Entity } from "typeorm";
 import { File } from "./File";
 import { Folder } from "./Folder";
 import { User } from "./User";
 
+@Entity()
 export class ChunkEmbedding {
     @PrimaryGeneratedColumn("uuid")
     id: string;
@@ -10,6 +11,11 @@ export class ChunkEmbedding {
     @Column()
     chunk: string;
 
+    /* 
+    embedding should be vector type for vector search but here,
+    vector datatype is not supported by typeorm so we change this 
+    datatype manully or by using query.
+    */
     @Column()
     embedding: string;
 
