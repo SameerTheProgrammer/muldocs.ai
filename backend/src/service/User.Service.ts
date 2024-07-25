@@ -37,9 +37,13 @@ export class UserService {
             });
             return await this.userRepository.save(data);
         } catch (error) {
+            // todo:- show class validator error properly
+            if (typeof error == "object") {
+                throw error;
+            }
             const err = createHttpError(
-                500,
-                "Failed to store the data in the database",
+                400,
+                "Faced error while saving new user",
             );
             throw err;
         }
