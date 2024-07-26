@@ -9,8 +9,8 @@ import { Logger } from "winston";
 import { UserService } from "../service/User.Service";
 import { setCookie } from "../utils/cookie";
 import createHttpError from "http-errors";
-import bcrypt from "bcryptjs";
-import { validationResult } from "express-validator";
+import { validateRequest } from "../utils/validation.util";
+import { comparePassword } from "../utils/bcrypt.util";
 
 export class AuthController {
     constructor(
@@ -24,12 +24,7 @@ export class AuthController {
         next: NextFunction,
     ) {
         try {
-            const result = validationResult(req);
-            if (!result.isEmpty()) {
-                return res.status(400).json({
-                    errors: result.array(),
-                });
-            }
+            validateRequest(req, res, next);
 
             const { name, email, password, cpassword } = req.body;
             this.logger.info("New request to register a user", {
@@ -56,12 +51,8 @@ export class AuthController {
 
     async login(req: IUserLoginRequest, res: Response, next: NextFunction) {
         try {
-            const result = validationResult(req);
-            if (!result.isEmpty()) {
-                return res.status(400).json({
-                    errors: result.array(),
-                });
-            }
+            validateRequest(req, res, next);
+
             const { email, password } = req.body;
             this.logger.info("New request to Login a user", {
                 email,
@@ -75,7 +66,7 @@ export class AuthController {
                 return next(error);
             }
 
-            const isCorrectPassword = await bcrypt.compare(
+            const isCorrectPassword = await comparePassword(
                 password,
                 user.password,
             );
@@ -100,12 +91,7 @@ export class AuthController {
         next: NextFunction,
     ) {
         try {
-            const result = validationResult(req);
-            if (!result.isEmpty()) {
-                return res.status(400).json({
-                    errors: result.array(),
-                });
-            }
+            validateRequest(req, res, next);
 
             const { oldPassword, newPassword, cpassword } = req.body;
             const userId = req.userId;
@@ -133,7 +119,7 @@ export class AuthController {
                 return next(error);
             }
 
-            const isCorrectPassword = await bcrypt.compare(
+            const isCorrectPassword = await comparePassword(
                 oldPassword,
                 user.password,
             );
@@ -158,12 +144,7 @@ export class AuthController {
         next: NextFunction,
     ) {
         try {
-            const result = validationResult(req);
-            if (!result.isEmpty()) {
-                return res.status(400).json({
-                    errors: result.array(),
-                });
-            }
+            validateRequest(req, res, next);
 
             const { name, email, password } = req.body;
             const userId = req.userId || req.params.id;

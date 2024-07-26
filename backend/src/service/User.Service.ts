@@ -6,8 +6,7 @@ import {
     IUserData,
 } from "../types/auth.types";
 import createHttpError from "http-errors";
-import bcrypt from "bcryptjs";
-import { hashPassword } from "../utils/index.utils";
+import { comparePassword, hashPassword } from "../utils/bcrypt.util";
 
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
@@ -21,12 +20,13 @@ export class UserService {
             throw error;
         }
 
-        // check is email is already registered or not
-        const user = await this.userRepository.findOne({ where: { email } });
-        if (user) {
+        const existingUser = await this.userRepository.findOne({
+            where: { email },
+        });
+        if (existingUser) {
             const error = createHttpError(
                 400,
-                "Email is already exists. Try with different email",
+                "Email is already registered. Try with different email",
             );
             throw error;
         }
@@ -119,7 +119,10 @@ export class UserService {
             throw error;
         }
 
-        const isCorrectPassword = await bcrypt.compare(password, user.password);
+        const isCorrectPassword = await comparePassword(
+            password,
+            user.password,
+        );
 
         if (!isCorrectPassword) {
             const error = createHttpError(400, "Invalid credentials");
