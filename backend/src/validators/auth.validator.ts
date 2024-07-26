@@ -105,16 +105,13 @@ export const loginValidation = checkSchema({
 export const newPasswordValidation = checkSchema({
     oldPassword: {
         exists: {
-            errorMessage: "Email is required",
+            errorMessage: "Old password is required",
             bail: true,
         },
         trim: true,
         notEmpty: {
-            errorMessage: "Email cannot be empty",
+            errorMessage: "Old password cannot be empty",
             bail: true,
-        },
-        isEmail: {
-            errorMessage: "Invalid Email",
         },
     },
     newPassword: {
