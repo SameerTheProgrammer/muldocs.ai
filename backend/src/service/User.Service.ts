@@ -7,6 +7,7 @@ import {
 } from "../types/auth.types";
 import createHttpError from "http-errors";
 import bcrypt from "bcryptjs";
+import { hashPassword } from "../utils/index.utils";
 
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
@@ -30,8 +31,7 @@ export class UserService {
             throw error;
         }
 
-        const saltRound = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRound);
+        const hashedPassword = await hashPassword(password);
 
         try {
             const data = this.userRepository.create({
@@ -94,8 +94,7 @@ export class UserService {
             throw error;
         }
 
-        const saltRound = 10;
-        const hashedPassword = await bcrypt.hash(newPassword, saltRound);
+        const hashedPassword = await hashPassword(newPassword);
 
         try {
             user.password = hashedPassword;
