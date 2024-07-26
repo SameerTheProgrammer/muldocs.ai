@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { User } from "../entity/User";
 
 export interface IUserData {
     name: string;
@@ -26,9 +27,20 @@ export interface IUpdatePasswordData {
     email?: string;
 }
 
-export interface INewPasswordRequest extends Request {
-    body: { oldPassword: string; newPassword: string; cpassword: string };
-    params: {
-        id: string;
+export interface AuthMiddlewareProps extends Request {
+    userId?: string;
+    user?: User;
+}
+
+export interface AuthMiddlewareRequest extends AuthMiddlewareProps {
+    cookies: {
+        PdfAiChat?: string;
     };
+    body: {
+        token?: string;
+    };
+}
+
+export interface INewPasswordRequest extends AuthMiddlewareProps {
+    body: { oldPassword: string; newPassword: string; cpassword: string };
 }
