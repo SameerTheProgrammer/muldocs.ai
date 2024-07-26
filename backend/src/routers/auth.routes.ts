@@ -19,6 +19,7 @@ import {
     newPasswordValidation,
     registerValidation,
 } from "../validators/auth.validator";
+import { isAuthenticated } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
@@ -55,9 +56,10 @@ router
     );
 
 router
-    .route("/newPassword/:id")
+    .route("/newPassword")
     .post(
         newPasswordValidation,
+        isAuthenticated as unknown as RequestHandler,
         (req: Request, res: Response, next: NextFunction) => {
             authController.newPassword(
                 req as INewPasswordRequest,

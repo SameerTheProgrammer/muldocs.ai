@@ -107,7 +107,13 @@ export class AuthController {
             }
 
             const { oldPassword, newPassword, cpassword } = req.body;
-            const userId = req.params.id;
+            const userId = req.userId;
+
+            if (!userId) {
+                const error = createHttpError(401, "User not authenticated");
+                return next(error);
+            }
+
             this.logger.info("New request to change the password", {
                 userId,
             });
