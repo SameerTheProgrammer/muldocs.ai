@@ -156,3 +156,46 @@ export const newPasswordValidation = checkSchema({
         },
     },
 });
+
+export const updateProfileValidation = checkSchema({
+    name: {
+        exists: {
+            errorMessage: "Name is required",
+            bail: true,
+        },
+        trim: true,
+        notEmpty: {
+            errorMessage: "Name cannot be empty",
+            bail: true,
+        },
+        isLength: {
+            options: { min: 2, max: 30 },
+            errorMessage: "Name should be between 2 and 30 characters",
+        },
+    },
+    email: {
+        exists: {
+            errorMessage: "Email is required",
+            bail: true,
+        },
+        trim: true,
+        notEmpty: {
+            errorMessage: "Email cannot be empty",
+            bail: true,
+        },
+        isEmail: {
+            errorMessage: "Invalid Email",
+        },
+    },
+    password: {
+        exists: {
+            errorMessage: "Password is required",
+            bail: true,
+        },
+        trim: true,
+        notEmpty: {
+            errorMessage: "Password cannot be empty",
+            bail: true,
+        },
+    },
+});

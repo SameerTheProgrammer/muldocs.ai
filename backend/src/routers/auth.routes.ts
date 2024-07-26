@@ -11,6 +11,7 @@ import { User } from "../entity/User";
 import logger from "./../config/logger";
 import {
     INewPasswordRequest,
+    IUpdateInfoRequest,
     IUserLoginRequest,
     IUserRegisterRequest,
 } from "../types/auth.types";
@@ -18,6 +19,7 @@ import {
     loginValidation,
     newPasswordValidation,
     registerValidation,
+    updateProfileValidation,
 } from "../validators/auth.validator";
 import { isAuthenticated } from "../middlewares/authMiddleware";
 
@@ -63,6 +65,20 @@ router
         (req: Request, res: Response, next: NextFunction) => {
             authController.newPassword(
                 req as INewPasswordRequest,
+                res,
+                next,
+            ) as unknown as RequestHandler;
+        },
+    );
+
+router
+    .route("/reset-profile")
+    .post(
+        updateProfileValidation,
+        isAuthenticated as unknown as RequestHandler,
+        (req: Request, res: Response, next: NextFunction) => {
+            authController.updateProfile(
+                req as IUpdateInfoRequest,
                 res,
                 next,
             ) as unknown as RequestHandler;

@@ -1,6 +1,10 @@
 import { Repository } from "typeorm";
 import { User } from "../entity/User";
-import { IUpdatePasswordData, IUserData } from "../types/auth.types";
+import {
+    IUpdateInfoData,
+    IUpdatePasswordData,
+    IUserData,
+} from "../types/auth.types";
 import createHttpError from "http-errors";
 import bcrypt from "bcryptjs";
 
@@ -95,6 +99,46 @@ export class UserService {
 
         try {
             user.password = hashedPassword;
+            return this.userRepository.save(user);
+        } catch (error) {
+            const err = createHttpError(
+                400,
+                "Faced error while saving new password",
+            );
+            throw err;
+        }
+    }
+
+    async updateInfo({ name, password, id, email }: IUpdateInfoData) {
+        const user = await this.userRepository.findOne({
+            where: { id },
+            select: ["password"],
+        });
+
+        if (!user) {
+            const error = createHttpError(400, "Invalid user id");
+            throw error;
+        }
+
+        const isCorrectPassword = await bcrypt.compare(password, user.password);
+
+        if (!isCorrectPassword) {
+            const error = createHttpError(400, "Invalid credentials");
+            throw error;
+        }
+
+        const isEmailUsed = await this.userRepository.findOne({
+            where: { email },
+        });
+
+        if (isEmailUsed) {
+            const error = createHttpError(400, "Email id is already regiested");
+            throw error;
+        }
+
+        try {
+            user.name = name;
+            user.email = email;
             return this.userRepository.save(user);
         } catch (error) {
             const err = createHttpError(

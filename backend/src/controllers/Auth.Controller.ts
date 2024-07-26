@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import {
     INewPasswordRequest,
+    IUpdateInfoRequest,
     IUserLoginRequest,
     IUserRegisterRequest,
 } from "../types/auth.types";
@@ -143,6 +144,48 @@ export class AuthController {
             }
 
             await this.UserService.updatePassword({ newPassword, id: userId });
+
+            this.logger.info("Password has been Updated", { id: userId });
+            res.status(201).json({ id: userId });
+        } catch (error) {
+            return next(error);
+        }
+    }
+
+    async updateProfile(
+        req: IUpdateInfoRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        try {
+            const result = validationResult(req);
+            if (!result.isEmpty()) {
+                return res.status(400).json({
+                    errors: result.array(),
+                });
+            }
+
+            const { name, email, password } = req.body;
+            const userId = req.userId || req.params.id;
+
+            if (!userId) {
+                const error = createHttpError(
+                    400,
+                    "User data not found or Invalid authentication",
+                );
+                return next(error);
+            }
+
+            this.logger.info("New request to change the user Profile data", {
+                userId,
+            });
+
+            await this.UserService.updateInfo({
+                name,
+                password,
+                email,
+                id: userId,
+            });
 
             this.logger.info("Password has been Updated", { id: userId });
             res.status(201).json({ id: userId });

@@ -44,3 +44,14 @@ export interface AuthMiddlewareRequest extends AuthMiddlewareProps {
 export interface INewPasswordRequest extends AuthMiddlewareProps {
     body: { oldPassword: string; newPassword: string; cpassword: string };
 }
+
+export interface IUpdateInfoData {
+    id: string;
+    name: string;
+    email: string;
+    password: string;
+}
+
+export interface IUpdateInfoRequest extends AuthMiddlewareProps {
+    body: IUpdateInfoData;
+}
