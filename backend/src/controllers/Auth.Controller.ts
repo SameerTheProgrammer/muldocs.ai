@@ -76,7 +76,7 @@ export class AuthController {
                 return next(error);
             }
 
-            this.logger.info("User has been LoggedIn", { id: user.id });
+            this.logger.info("User logged in", { id: user.id });
 
             setCookie(res, user.id);
             res.status(200).json({ id: user.id });
@@ -101,7 +101,7 @@ export class AuthController {
                 return next(error);
             }
 
-            this.logger.info("New request to change the password", {
+            this.logger.info("Change password request", {
                 userId,
             });
 
@@ -131,7 +131,7 @@ export class AuthController {
 
             await this.UserService.updatePassword({ newPassword, id: userId });
 
-            this.logger.info("Password has been Updated", { id: userId });
+            this.logger.info("Password updated", { id: userId });
             res.status(201).json({ id: userId });
         } catch (error) {
             return next(error);
@@ -169,7 +169,7 @@ export class AuthController {
             });
 
             this.logger.info("Password has been Updated", { id: userId });
-            res.status(201).json({ id: userId });
+            res.status(200).json({ id: userId });
         } catch (error) {
             return next(error);
         }

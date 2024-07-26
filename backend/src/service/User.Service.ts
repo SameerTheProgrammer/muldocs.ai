@@ -45,10 +45,7 @@ export class UserService {
             if (typeof error == "object") {
                 throw error;
             }
-            const err = createHttpError(
-                400,
-                "Faced error while saving new user",
-            );
+            const err = createHttpError(400, "Error saving new user");
             throw err;
         }
     }
@@ -78,16 +75,9 @@ export class UserService {
     }
 
     async updatePassword({ newPassword, id, email }: IUpdatePasswordData) {
-        let user;
-        if (id) {
-            user = await this.userRepository.findOne({
-                where: { id },
-            });
-        } else {
-            user = await this.userRepository.findOne({
-                where: { email },
-            });
-        }
+        const user = id
+            ? await this.findByIdWithPassword(id)
+            : await this.findByEmailWithPassword(email!);
 
         if (!user) {
             const error = createHttpError(400, "Invalid user id");
@@ -100,10 +90,7 @@ export class UserService {
             user.password = hashedPassword;
             return this.userRepository.save(user);
         } catch (error) {
-            const err = createHttpError(
-                400,
-                "Faced error while saving new password",
-            );
+            const err = createHttpError(400, "Error updating password");
             throw err;
         }
     }
@@ -129,24 +116,19 @@ export class UserService {
             throw error;
         }
 
-        const isEmailUsed = await this.userRepository.findOne({
-            where: { email },
-        });
+        const isEmailUsed = await this.findByEmail(email);
 
         if (isEmailUsed) {
-            const error = createHttpError(400, "Email id is already regiested");
+            const error = createHttpError(400, "Email is already registered");
             throw error;
         }
 
         try {
-            user.name = name;
-            user.email = email;
+            user.name = name || user.name;
+            user.email = email || user.email;
             return this.userRepository.save(user);
         } catch (error) {
-            const err = createHttpError(
-                400,
-                "Faced error while saving new password",
-            );
+            const err = createHttpError(400, "Error updating user info");
             throw err;
         }
     }
