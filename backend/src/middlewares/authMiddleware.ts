@@ -13,7 +13,7 @@ export const isAuthenticated = async (
     res: Response,
     next: NextFunction,
 ) => {
-    const token = req.cookies.PdfAiChat || req.body.token;
+    const token = req.cookies["muldocs.ai"] || req.body.token;
 
     if (!token) {
         return next(createHttpError(401, "Authentication token is missing"));

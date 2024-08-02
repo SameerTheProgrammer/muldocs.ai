@@ -9,6 +9,9 @@ export class Otp {
     @Column()
     otp: string;
 
+    @Column({ type: "boolean", default: false })
+    isUsed: boolean;
+
     @Column()
     expire: Date;
 

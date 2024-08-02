@@ -95,6 +95,20 @@ export class UserService {
         }
     }
 
+    async updateVerify(email: string) {
+        try {
+            return this.userRepository.update(email, {
+                verify: true,
+            });
+        } catch (error) {
+            const err = createHttpError(
+                400,
+                "Error updating user verify field",
+            );
+            throw err;
+        }
+    }
+
     async updateInfo({ name, password, id, email }: IUpdateInfoData) {
         const user = await this.userRepository.findOne({
             where: { id },

@@ -1,9 +1,11 @@
 import { NextFunction, Response } from "express";
 import {
     INewPasswordRequest,
+    IResendOtpRequest,
     IUpdateInfoRequest,
     IUserLoginRequest,
     IUserRegisterRequest,
+    IVerifyOtpRequest,
 } from "../types/auth.types";
 import { Logger } from "winston";
 import { UserService } from "../service/User.Service";
@@ -11,7 +13,7 @@ import { setCookie } from "../utils/cookie";
 import createHttpError from "http-errors";
 import { validateRequest } from "../utils/validation.util";
 import { comparePassword } from "../utils/bcrypt.util";
-import { OtpService } from "../service/Opt.Service";
+import { OtpService } from "../service/Otp.Service";
 import otpNotificationQueue from "../config/bullmq";
 
 export class AuthController {
@@ -55,7 +57,10 @@ export class AuthController {
                 { id: newUser.id },
             );
 
-            res.status(201).json({ id: newUser.id });
+            res.status(201).json({
+                message: "Otp is sended to your mail id",
+                id: newUser.id,
+            });
         } catch (error) {
             return next(error);
         }
@@ -88,10 +93,15 @@ export class AuthController {
                 return next(error);
             }
 
+            if (!user.verify) {
+                const error = createHttpError(400, "Account is not verified");
+                return next(error);
+            }
+
             this.logger.info("User logged in", { id: user.id });
 
             setCookie(res, user.id);
-            res.status(200).json({ id: user.id });
+            res.status(200).json({ user });
         } catch (error) {
             return next(error);
         }
@@ -185,5 +195,70 @@ export class AuthController {
         } catch (error) {
             return next(error);
         }
+    }
+
+    async verifiyAccount(
+        req: IVerifyOtpRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        validateRequest(req, res, next);
+
+        const { email, otp } = req.body;
+
+        this.logger.info("New request to verify account", {
+            email,
+        });
+
+        const user = await this.UserService.findByEmail(email);
+
+        if (!user) {
+            const error = createHttpError(400, "Account not found");
+            return next(error);
+        }
+
+        if (!user.verify) {
+            const error = createHttpError(400, "Account is already verified");
+            return next(error);
+        }
+
+        await this.otpService.check(email, otp);
+        await this.UserService.updateVerify(email);
+
+        this.logger.info("Account verified", {
+            email,
+            id: user.id,
+        });
+
+        setCookie(res, user.id);
+
+        res.status(200).json({ user });
+    }
+
+    async sendOtp(req: IResendOtpRequest, res: Response, next: NextFunction) {
+        validateRequest(req, res, next);
+
+        const { email } = req.body;
+        this.logger.info(`new request to send otp`, { email });
+
+        const user = await this.UserService.findByEmail(email);
+
+        if (!user) {
+            const error = createHttpError(400, "Account not found");
+            return next(error);
+        }
+
+        const otp = this.otpService.create(user);
+
+        await otpNotificationQueue.add("otpNotificationQueue", {
+            emial: user.email,
+            otp,
+        });
+
+        this.logger.info(`Otp is send to mail id: ${user.email}`, {
+            id: user.id,
+        });
+
+        res.status(200).json();
     }
 }

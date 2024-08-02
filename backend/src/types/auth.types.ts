@@ -34,7 +34,7 @@ export interface AuthMiddlewareProps extends Request {
 
 export interface AuthMiddlewareRequest extends AuthMiddlewareProps {
     cookies: {
-        PdfAiChat?: string;
+        "muldocs.ai"?: string;
     };
     body: {
         token?: string;
@@ -54,4 +54,17 @@ export interface IUpdateInfoData {
 
 export interface IUpdateInfoRequest extends AuthMiddlewareProps {
     body: IUpdateInfoData;
+}
+
+export interface IVerifyOtpRequest extends Request {
+    body: {
+        email: string;
+        otp: string;
+    };
+}
+
+export interface IResendOtpRequest extends Request {
+    body: {
+        email: string;
+    };
 }

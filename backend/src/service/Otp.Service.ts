@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
 import { Otp } from "../entity/Otp";
-import { User } from "./../entity/User";
+import { User } from "../entity/User";
 import env from "../config/dotenv";
 import createHttpError from "http-errors";
 
@@ -28,16 +28,29 @@ export class OtpService {
         }
     }
 
-    async check(userId: string, otp: string): Promise<boolean> {
+    async check(email: string, otp: string) {
         try {
-            const userOtps = await this.optRepository.findOne({
-                where: { user: { id: userId }, otp },
+            const userOtp = await this.optRepository.findOne({
+                where: { user: { id: email }, otp },
             });
-            if (!userOtps) {
+
+            if (!userOtp) {
                 const error = createHttpError(400, "Wrong OTP");
                 throw error;
             }
-            return userOtps.expire > new Date(Date.now());
+
+            if (userOtp.isUsed) {
+                const error = createHttpError(400, "OTP is already used");
+                throw error;
+            }
+
+            const isExpired = userOtp.expire > new Date(Date.now());
+
+            if (!isExpired) {
+                const error = createHttpError(400, "Otp is expired");
+                throw error;
+            }
+            return;
         } catch (err) {
             const error = createHttpError(400, "Error while validating OTP");
             throw error;

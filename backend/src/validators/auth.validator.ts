@@ -199,3 +199,51 @@ export const updateProfileValidation = checkSchema({
         },
     },
 });
+
+export const sendOtp = checkSchema({
+    email: {
+        exists: {
+            errorMessage: "Email is required",
+            bail: true,
+        },
+        trim: true,
+        notEmpty: {
+            errorMessage: "Email cannot be empty",
+            bail: true,
+        },
+        isEmail: {
+            errorMessage: "Invalid Email",
+        },
+    },
+});
+
+export const verifiyAccount = checkSchema({
+    email: {
+        exists: {
+            errorMessage: "Email is required",
+            bail: true,
+        },
+        trim: true,
+        notEmpty: {
+            errorMessage: "Email cannot be empty",
+            bail: true,
+        },
+        isEmail: {
+            errorMessage: "Invalid Email",
+        },
+    },
+    otp: {
+        exists: {
+            errorMessage: "OTP is required",
+            bail: true,
+        },
+        trim: true,
+        notEmpty: {
+            errorMessage: "OTP cannot be empty",
+            bail: true,
+        },
+        isString: {
+            errorMessage: "OTP should be in string type",
+        },
+    },
+});

@@ -22,10 +22,7 @@ export class User {
     @Column()
     name: string;
 
-    @IsEmail(
-        { allow_ip_domain: true },
-        { message: "$targetName should be valid email" },
-    )
+    @IsEmail()
     @Column({ unique: true })
     email: string;
 
@@ -36,7 +33,7 @@ export class User {
     @Column({ select: false })
     password: string;
 
-    @Column({ type: "boolean" })
+    @Column({ type: "boolean", default: false })
     verify: boolean;
 
     @OneToMany(() => Folder, (folder) => folder.user)

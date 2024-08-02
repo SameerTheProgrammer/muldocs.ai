@@ -10,7 +10,7 @@ const generateJwtToken = (userId: string) => {
 
 export const setCookie = (res: Response, userId: string) => {
     const token = generateJwtToken(userId);
-    res.cookie("PdfAiChat", token, {
+    res.cookie("muldocs.ai", token, {
         httpOnly: true,
         domain: env.COOKIE_DOMAIN,
         sameSite: "strict",

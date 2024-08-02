@@ -11,9 +11,11 @@ import { User } from "../entity/User";
 import logger from "./../config/logger";
 import {
     INewPasswordRequest,
+    IResendOtpRequest,
     IUpdateInfoRequest,
     IUserLoginRequest,
     IUserRegisterRequest,
+    IVerifyOtpRequest,
 } from "../types/auth.types";
 import {
     loginValidation,
@@ -22,14 +24,18 @@ import {
     updateProfileValidation,
 } from "../validators/auth.validator";
 import { isAuthenticated } from "../middlewares/authMiddleware";
+import { OtpService } from "./../service/Otp.Service";
+import { Otp } from "../entity/Otp";
 
 const router = express.Router();
 
 const userRepository = AppDataSource.getRepository(User);
+const otpRepository = AppDataSource.getRepository(Otp);
 
 const userService = new UserService(userRepository);
+const otpService = new OtpService(otpRepository);
 
-const authController = new AuthController(userService, logger);
+const authController = new AuthController(userService, logger, otpService);
 
 router
     .route("/register")
@@ -79,6 +85,32 @@ router
         (req: Request, res: Response, next: NextFunction) => {
             authController.updateProfile(
                 req as IUpdateInfoRequest,
+                res,
+                next,
+            ) as unknown as RequestHandler;
+        },
+    );
+
+router
+    .route("/verify")
+    .post(
+        updateProfileValidation,
+        (req: Request, res: Response, next: NextFunction) => {
+            authController.verifiyAccount(
+                req as IVerifyOtpRequest,
+                res,
+                next,
+            ) as unknown as RequestHandler;
+        },
+    );
+
+router
+    .route("/resend-otp")
+    .post(
+        updateProfileValidation,
+        (req: Request, res: Response, next: NextFunction) => {
+            authController.sendOtp(
+                req as IResendOtpRequest,
                 res,
                 next,
             ) as unknown as RequestHandler;
