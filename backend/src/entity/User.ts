@@ -36,6 +36,9 @@ export class User {
     @Column({ select: false })
     password: string;
 
+    @Column({ type: "boolean" })
+    verify: boolean;
+
     @OneToMany(() => Folder, (folder) => folder.user)
     folders: Folder[];
 

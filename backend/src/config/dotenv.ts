@@ -18,6 +18,9 @@ export const env = cleanEnv(process.env, {
     JWT_TOKEN_EXPIRY_DAYS: str(),
     COOKIE_MAXAGE_DAYS: num(),
     COOKIE_DOMAIN: str(),
+    OTP_EXPIRY_IN_MINUTE: num(),
+    REDIS_HOST: str(),
+    REDIS_PORT: port(),
 });
 
 export default env;

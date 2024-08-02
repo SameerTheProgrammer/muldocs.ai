@@ -11,11 +11,14 @@ import { setCookie } from "../utils/cookie";
 import createHttpError from "http-errors";
 import { validateRequest } from "../utils/validation.util";
 import { comparePassword } from "../utils/bcrypt.util";
+import { OtpService } from "../service/Opt.Service";
+import otpNotificationQueue from "../config/bullmq";
 
 export class AuthController {
     constructor(
         private UserService: UserService,
         private logger: Logger,
+        private otpService: OtpService,
     ) {}
 
     async register(
@@ -40,9 +43,18 @@ export class AuthController {
                 cpassword,
             });
 
-            this.logger.info("User has been registered", { id: newUser.id });
+            const otp = this.otpService.create(newUser);
 
-            setCookie(res, newUser.id);
+            await otpNotificationQueue.add("otpNotificationQueue", {
+                emial: newUser.email,
+                otp,
+            });
+
+            this.logger.info(
+                `User has been registered and Otp is send to mail id: ${newUser.email}`,
+                { id: newUser.id },
+            );
+
             res.status(201).json({ id: newUser.id });
         } catch (error) {
             return next(error);
