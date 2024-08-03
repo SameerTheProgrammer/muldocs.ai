@@ -9,6 +9,13 @@ config({
 export const env = cleanEnv(process.env, {
     PORT: port(),
     NODE_ENV: str({ default: "dev", choices: ["test", "prod", "dev"] }),
+
+    REDIS_SERVICE_URI: str(),
+
+    EMAIL: str(),
+    MAILING_ID: str(),
+    MAILING_REFRESH: str(),
+    MAILING_SECRET: str(),
 });
 
 export default env;
