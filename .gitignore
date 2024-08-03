@@ -6,8 +6,6 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
-.idea/
-.vscode/
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -76,12 +74,12 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.dev
+.env.prod
 .env.development.local
 .env.test.local
 .env.production.local
 .env.local
-.env.dev
-.env.prod
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

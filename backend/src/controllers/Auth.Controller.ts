@@ -48,8 +48,9 @@ export class AuthController {
             const otp = this.otpService.create(newUser);
 
             await otpNotificationQueue.add("otpNotificationQueue", {
-                emial: newUser.email,
+                email: newUser.email,
                 otp,
+                name: newUser.name,
             });
 
             this.logger.info(
@@ -251,8 +252,9 @@ export class AuthController {
         const otp = this.otpService.create(user);
 
         await otpNotificationQueue.add("otpNotificationQueue", {
-            emial: user.email,
+            email: user.email,
             otp,
+            name: user.name,
         });
 
         this.logger.info(`Otp is send to mail id: ${user.email}`, {
