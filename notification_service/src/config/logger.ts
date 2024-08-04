@@ -8,18 +8,6 @@ const logger = winston.createLogger({
         winston.format.json(),
     ),
     transports: [
-        new winston.transports.File({
-            dirname: "logs",
-            filename: "combined.log",
-            level: "info",
-            silent: env.NODE_ENV == "test",
-        }),
-        new winston.transports.File({
-            dirname: "logs",
-            filename: "error.log",
-            level: "error",
-            silent: env.NODE_ENV == "test",
-        }),
         new winston.transports.Console({
             level: "info",
             silent: env.NODE_ENV == "test",
