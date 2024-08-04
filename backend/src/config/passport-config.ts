@@ -12,7 +12,7 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-            callbackURL: "/auth/google/callback",
+            callbackURL: "api/v1/auth/google/callback",
         },
         async (
             _accessToken: string,
@@ -59,7 +59,7 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    done(null, (user as { id: string }).id);
 });
 
 passport.deserializeUser(

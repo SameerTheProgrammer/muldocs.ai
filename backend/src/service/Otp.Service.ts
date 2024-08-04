@@ -7,8 +7,8 @@ import createHttpError from "http-errors";
 export class OtpService {
     constructor(private optRepository: Repository<Otp>) {}
 
-    private generateOtp() {
-        const otp = (Math.random() * 100000).toString().slice(0, 6);
+    private generateOtp(): string {
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
         return otp;
     }
 

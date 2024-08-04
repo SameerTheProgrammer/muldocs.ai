@@ -14,7 +14,7 @@ import createHttpError from "http-errors";
 import { validateRequest } from "../utils/validation.util";
 import { comparePassword } from "../utils/bcrypt.util";
 import { OtpService } from "../service/Otp.Service";
-import { otpNotificationQueue } from "../config/bullmq";
+import { addJobToQueue } from "../config/bullmq";
 
 export class AuthController {
     constructor(
@@ -52,11 +52,11 @@ export class AuthController {
                 password,
             });
 
-            const otp = this.otpService.create(newUser);
+            const newOtp = await this.otpService.create(newUser);
 
-            await otpNotificationQueue.add("otpNotificationQueue", {
+            await addJobToQueue({
                 email: newUser.email,
-                otp,
+                otp: newOtp.otp,
                 name: newUser.name,
             });
 
@@ -91,7 +91,7 @@ export class AuthController {
                 return next(error);
             }
 
-            if (!user.googleId || !user.password) {
+            if (user.googleId || !user.password) {
                 const error = createHttpError(
                     400,
                     "Create new password because You register with Google",
@@ -273,11 +273,11 @@ export class AuthController {
             return next(error);
         }
 
-        const otp = this.otpService.create(user);
+        const newOtp = await this.otpService.create(user);
 
-        await otpNotificationQueue.add("otpNotificationQueue", {
+        await addJobToQueue({
             email: user.email,
-            otp,
+            otp: newOtp.otp,
             name: user.name,
         });
 
