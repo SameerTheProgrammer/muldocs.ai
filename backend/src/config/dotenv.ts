@@ -26,7 +26,7 @@ export const env = cleanEnv(process.env, {
 
     REDIS_SERVICE_URI: str(),
 
-    COOKIE_KEY: str(),
+    SESSION_SECRET: str(),
 
     FRONTEND_URL: str(),
 });
