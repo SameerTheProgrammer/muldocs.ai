@@ -6,7 +6,7 @@ import {
     BeforeInsert,
     OneToMany,
 } from "typeorm";
-import { IsEmail, Length, MinLength, validate } from "class-validator";
+import { IsEmail, Length, validate } from "class-validator";
 import createHttpError from "http-errors";
 import { Folder } from "./Folder";
 
@@ -26,15 +26,14 @@ export class User {
     @Column({ unique: true })
     email: string;
 
-    @MinLength(10, {
-        message:
-            "$targetName is too short. Minimal length is $constraint1 characters, but actual is $value",
-    })
-    @Column({ select: false })
+    @Column({ select: false, nullable: true })
     password: string;
 
     @Column({ type: "boolean", default: false })
     verify: boolean;
+
+    @Column({ nullable: true })
+    googleId: string;
 
     @OneToMany(() => Folder, (folder) => folder.user)
     folders: Folder[];

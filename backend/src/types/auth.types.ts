@@ -5,7 +5,8 @@ export interface IUserData {
     name: string;
     email: string;
     password: string;
-    cpassword: string;
+    cpassword?: string;
+    googleId?: string;
 }
 
 export interface IUserRegisterRequest extends Request {

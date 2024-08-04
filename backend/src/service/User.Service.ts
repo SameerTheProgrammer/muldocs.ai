@@ -11,15 +11,7 @@ import { comparePassword, hashPassword } from "../utils/bcrypt.util";
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
 
-    async create({ name, email, password, cpassword }: IUserData) {
-        if (cpassword !== password) {
-            const error = createHttpError(
-                400,
-                "Confirm password should match with Password",
-            );
-            throw error;
-        }
-
+    async create({ name, email, password, googleId }: IUserData) {
         const existingUser = await this.userRepository.findOne({
             where: { email },
         });
@@ -31,13 +23,17 @@ export class UserService {
             throw error;
         }
 
-        const hashedPassword = await hashPassword(password);
+        let hashedPassword = "";
+        if (password) {
+            hashedPassword = await hashPassword(password);
+        }
 
         try {
             const data = this.userRepository.create({
                 name,
                 email,
                 password: hashedPassword,
+                googleId: googleId || "",
             });
             return await this.userRepository.save(data);
         } catch (error) {
@@ -56,6 +52,10 @@ export class UserService {
                 email: email.toLowerCase(),
             },
         });
+    }
+
+    async findById(id: string) {
+        return await this.userRepository.findOne({ where: { id } });
     }
 
     async findByEmailWithPassword(email: string) {

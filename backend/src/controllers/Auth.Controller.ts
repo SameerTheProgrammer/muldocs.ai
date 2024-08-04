@@ -38,11 +38,18 @@ export class AuthController {
                 password: "****",
             });
 
+            if (cpassword !== password) {
+                const error = createHttpError(
+                    400,
+                    "Confirm password should match with Password",
+                );
+                return next(error);
+            }
+
             const newUser = await this.UserService.create({
                 name,
                 email,
                 password,
-                cpassword,
             });
 
             const otp = this.otpService.create(newUser);
@@ -81,6 +88,14 @@ export class AuthController {
             const user = await this.UserService.findByEmailWithPassword(email);
             if (!user) {
                 const error = createHttpError(400, "Invalid credentials");
+                return next(error);
+            }
+
+            if (!user.googleId || !user.password) {
+                const error = createHttpError(
+                    400,
+                    "Create new password because You register with Google",
+                );
                 return next(error);
             }
 
@@ -170,6 +185,15 @@ export class AuthController {
             validateRequest(req, res, next);
 
             const { name, email, password } = req.body;
+
+            if (!req.user?.googleId || !req.user?.password) {
+                const error = createHttpError(
+                    400,
+                    "Create new password because You register with Google",
+                );
+                return next(error);
+            }
+
             const userId = req.userId || req.params.id;
 
             if (!userId) {

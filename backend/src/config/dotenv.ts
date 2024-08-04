@@ -25,6 +25,10 @@ export const env = cleanEnv(process.env, {
     OTP_EXPIRY_IN_MINUTE: num(),
 
     REDIS_SERVICE_URI: str(),
+
+    COOKIE_KEY: str(),
+
+    FRONTEND_URL: str(),
 });
 
 export default env;
