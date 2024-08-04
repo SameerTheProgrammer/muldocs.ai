@@ -11,7 +11,6 @@ import morgan from "morgan";
 import sanitize from "express-mongo-sanitize";
 import logger from "./config/logger";
 import cookieSession from "cookie-session";
-import "./config/passport-config";
 import passport from "passport";
 import authRouter from "./routers/auth.routes";
 import googleAuthRouter from "./routers/google.auth.routes";
@@ -39,7 +38,6 @@ app.use(
         keys: [env.COOKIE_KEY],
     }),
 );
-
 app.use("/api/v1/auth/google", googleAuthRouter);
 app.use("/api/v1/auth", authRouter);
 

@@ -14,7 +14,7 @@ import createHttpError from "http-errors";
 import { validateRequest } from "../utils/validation.util";
 import { comparePassword } from "../utils/bcrypt.util";
 import { OtpService } from "../service/Otp.Service";
-import otpNotificationQueue from "../config/bullmq";
+import { otpNotificationQueue } from "../config/bullmq";
 
 export class AuthController {
     constructor(
