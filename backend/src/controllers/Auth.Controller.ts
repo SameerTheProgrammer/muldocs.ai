@@ -285,6 +285,6 @@ export class AuthController {
             id: user.id,
         });
 
-        res.status(200).json();
+        res.status(200).json({ message: "OTP is sended to your mail id" });
     }
 }

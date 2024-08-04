@@ -21,6 +21,7 @@ import {
     loginValidation,
     newPasswordValidation,
     registerValidation,
+    sendOtpValidation,
     updateProfileValidation,
 } from "../validators/auth.validator";
 import { isAuthenticated } from "../middlewares/authMiddleware";
@@ -107,7 +108,7 @@ router
 router
     .route("/resend-otp")
     .post(
-        updateProfileValidation,
+        sendOtpValidation,
         (req: Request, res: Response, next: NextFunction) => {
             authController.sendOtp(
                 req as IResendOtpRequest,

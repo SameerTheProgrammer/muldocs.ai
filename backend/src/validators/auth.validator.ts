@@ -200,7 +200,7 @@ export const updateProfileValidation = checkSchema({
     },
 });
 
-export const sendOtp = checkSchema({
+export const sendOtpValidation = checkSchema({
     email: {
         exists: {
             errorMessage: "Email is required",
