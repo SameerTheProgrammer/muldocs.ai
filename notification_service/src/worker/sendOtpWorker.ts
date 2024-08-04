@@ -12,15 +12,15 @@ type JobData = {
 export const otpWorkerConnect = () => {
     const sendOtpWorker = new Worker(
         "otpNotificationQueue",
-        async (job: Job) => {
+        async (job: Job<JobData>) => {
             try {
-                const { email, otp, name } = job.data as JobData;
+                const { email, otp, name } = job.data;
                 await sendVerificationEmail(email, otp, name);
             } catch (error) {
                 logger.error(
                     `Failed to process job ${job.id}: ${error instanceof Error ? error.message : "Unknown error"}`,
                 );
-                throw error; // Make sure to rethrow to mark the job as failed
+                throw error;
             }
         },
         { connection: getRedisConnection() },

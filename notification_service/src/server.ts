@@ -3,11 +3,12 @@ import env from "./config/dotenv";
 import logger from "./config/logger";
 import { redisConnect } from "./config/redis";
 import { otpWorkerConnect } from "./worker/sendOtpWorker";
-const startServer = () => {
+
+const startServer = async () => {
     const PORT = env.PORT || 8000;
 
     try {
-        redisConnect();
+        await redisConnect();
 
         otpWorkerConnect();
         logger.info(`OTP worker is initialized`);
