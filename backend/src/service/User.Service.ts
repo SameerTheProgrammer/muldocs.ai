@@ -7,6 +7,7 @@ import {
 } from "../types/auth.types";
 import createHttpError from "http-errors";
 import { comparePassword, hashPassword } from "../utils/bcrypt.util";
+import { AppDataSource } from "../config/data-source";
 
 export class UserService {
     constructor(private userRepository: Repository<User>) {}
@@ -87,8 +88,11 @@ export class UserService {
         const hashedPassword = await hashPassword(newPassword);
 
         try {
-            user.password = hashedPassword;
-            return this.userRepository.save(user);
+            return await AppDataSource.createQueryBuilder()
+                .update(User)
+                .set({ password: hashedPassword })
+                .where("email = :email", { email })
+                .execute();
         } catch (error) {
             const err = createHttpError(400, "Error updating password");
             throw err;
