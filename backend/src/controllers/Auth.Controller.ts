@@ -183,37 +183,41 @@ export class AuthController {
         res: Response,
         next: NextFunction,
     ) {
-        validateRequest(req, res, next);
+        try {
+            validateRequest(req, res, next);
 
-        const { email, newPassword, cpassword } = req.body;
+            const { email, newPassword, cpassword } = req.body;
 
-        this.logger.info("New request to forgot password", {
-            email,
-        });
+            this.logger.info("New request to forgot password", {
+                email,
+            });
 
-        if (cpassword !== newPassword) {
-            const error = createHttpError(
-                400,
-                "Confirm password should match with Password",
-            );
+            if (cpassword !== newPassword) {
+                const error = createHttpError(
+                    400,
+                    "Confirm password should match with Password",
+                );
+                return next(error);
+            }
+
+            const user = await this.UserService.findByEmail(email);
+
+            if (!user) {
+                const error = createHttpError(400, "Account not found");
+                return next(error);
+            }
+
+            await this.UserService.updatePassword({ email, newPassword });
+
+            this.logger.info("New password created", {
+                email,
+                id: user.id,
+            });
+
+            res.status(200).json({ user });
+        } catch (error) {
             return next(error);
         }
-
-        const user = await this.UserService.findByEmail(email);
-
-        if (!user) {
-            const error = createHttpError(400, "Account not found");
-            return next(error);
-        }
-
-        await this.UserService.updatePassword({ email, newPassword });
-
-        this.logger.info("New password created", {
-            email,
-            id: user.id,
-        });
-
-        res.status(200).json({ user });
     }
 
     async updateProfile(
@@ -267,37 +271,45 @@ export class AuthController {
         res: Response,
         next: NextFunction,
     ) {
-        validateRequest(req, res, next);
+        try {
+            validateRequest(req, res, next);
 
-        const { email, otp } = req.body;
+            const { email, otp } = req.body;
 
-        this.logger.info("New request to verify account", {
-            email,
-        });
+            this.logger.info("New request to verify account", {
+                email,
+            });
 
-        const user = await this.UserService.findByEmail(email);
+            const user = await this.UserService.findByEmail(email);
 
-        if (!user) {
-            const error = createHttpError(400, "Account not found");
+            if (!user) {
+                const error = createHttpError(400, "Account not found");
+                return next(error);
+            }
+
+            if (user.verify) {
+                const error = createHttpError(
+                    400,
+                    "Account is already verified",
+                );
+                return next(error);
+            }
+
+            await this.otpService.check(email, otp);
+
+            const updatedUser = await this.UserService.updateVerify(email);
+
+            this.logger.info("Account verified", {
+                email,
+                id: updatedUser.id,
+            });
+
+            setCookie(res, updatedUser.id);
+
+            res.status(200).json({ updatedUser });
+        } catch (error) {
             return next(error);
         }
-
-        if (!user.verify) {
-            const error = createHttpError(400, "Account is already verified");
-            return next(error);
-        }
-
-        await this.otpService.check(email, otp);
-        await this.UserService.updateVerify(email);
-
-        this.logger.info("Account verified", {
-            email,
-            id: user.id,
-        });
-
-        setCookie(res, user.id);
-
-        res.status(200).json({ user });
     }
 
     async verifiyOtp(
@@ -305,56 +317,64 @@ export class AuthController {
         res: Response,
         next: NextFunction,
     ) {
-        validateRequest(req, res, next);
+        try {
+            validateRequest(req, res, next);
 
-        const { email, otp } = req.body;
+            const { email, otp } = req.body;
 
-        this.logger.info("New request to verify Otp", {
-            email,
-        });
+            this.logger.info("New request to verify Otp", {
+                email,
+            });
 
-        const user = await this.UserService.findByEmail(email);
+            const user = await this.UserService.findByEmail(email);
 
-        if (!user) {
-            const error = createHttpError(400, "Account not found");
+            if (!user) {
+                const error = createHttpError(400, "Account not found");
+                return next(error);
+            }
+
+            await this.otpService.check(email, otp);
+
+            this.logger.info("Otp verified", {
+                email,
+                id: user.id,
+            });
+
+            res.status(200).json({ user });
+        } catch (error) {
             return next(error);
         }
-
-        await this.otpService.check(email, otp);
-
-        this.logger.info("Otp verified", {
-            email,
-            id: user.id,
-        });
-
-        res.status(200).json({ user });
     }
 
     async sendOtp(req: IResendOtpRequest, res: Response, next: NextFunction) {
-        validateRequest(req, res, next);
+        try {
+            validateRequest(req, res, next);
 
-        const { email } = req.body;
-        this.logger.info(`new request to send otp`, { email });
+            const { email } = req.body;
+            this.logger.info(`new request to send otp`, { email });
 
-        const user = await this.UserService.findByEmail(email);
+            const user = await this.UserService.findByEmail(email);
 
-        if (!user) {
-            const error = createHttpError(400, "Account not found");
+            if (!user) {
+                const error = createHttpError(400, "Account not found");
+                return next(error);
+            }
+
+            const newOtp = await this.otpService.create(user);
+
+            await addJobToQueue({
+                email: user.email,
+                otp: newOtp.otp,
+                name: user.name,
+            });
+
+            this.logger.info(`Otp is send to mail id: ${user.email}`, {
+                id: user.id,
+            });
+
+            res.status(200).json({ message: "OTP is sended to your mail id" });
+        } catch (error) {
             return next(error);
         }
-
-        const newOtp = await this.otpService.create(user);
-
-        await addJobToQueue({
-            email: user.email,
-            otp: newOtp.otp,
-            name: user.name,
-        });
-
-        this.logger.info(`Otp is send to mail id: ${user.email}`, {
-            id: user.id,
-        });
-
-        res.status(200).json({ message: "OTP is sended to your mail id" });
     }
 }
