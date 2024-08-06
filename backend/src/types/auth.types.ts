@@ -46,6 +46,10 @@ export interface INewPasswordRequest extends AuthMiddlewareProps {
     body: { oldPassword: string; newPassword: string; cpassword: string };
 }
 
+export interface IForgotPasswordRequest extends Request {
+    body: { email: string; newPassword: string; cpassword: string };
+}
+
 export interface IUpdateInfoData {
     id: string;
     name: string;
@@ -55,6 +59,13 @@ export interface IUpdateInfoData {
 
 export interface IUpdateInfoRequest extends AuthMiddlewareProps {
     body: IUpdateInfoData;
+}
+
+export interface IVerifyAccountRequest extends Request {
+    body: {
+        email: string;
+        otp: string;
+    };
 }
 
 export interface IVerifyOtpRequest extends Request {

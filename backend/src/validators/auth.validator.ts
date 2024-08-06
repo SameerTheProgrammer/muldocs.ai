@@ -200,6 +200,65 @@ export const updateProfileValidation = checkSchema({
     },
 });
 
+export const forgotPasswordValidation = checkSchema({
+    email: {
+        exists: {
+            errorMessage: "Email is required",
+            bail: true,
+        },
+        trim: true,
+        notEmpty: {
+            errorMessage: "Email cannot be empty",
+            bail: true,
+        },
+        isEmail: {
+            errorMessage: "Invalid Email",
+        },
+    },
+    password: {
+        exists: {
+            errorMessage: "Password is required",
+            bail: true,
+        },
+        trim: true,
+        notEmpty: {
+            errorMessage: "Password cannot be empty",
+            bail: true,
+        },
+        isLength: {
+            options: { min: 10 },
+            errorMessage: "Password should be at least 10 characters long",
+            bail: true,
+        },
+        isStrongPassword: {
+            options: {
+                minUppercase: 1,
+                minLowercase: 1,
+                minSymbols: 1,
+                minNumbers: 1,
+            },
+            errorMessage:
+                "Password should contain at least one symbol, number, uppercase, and lowercase letter",
+        },
+    },
+    cpassword: {
+        exists: {
+            errorMessage: "Confirm password is required",
+            bail: true,
+        },
+        trim: true,
+        notEmpty: {
+            errorMessage: "Confirm password cannot be empty",
+            bail: true,
+        },
+        custom: {
+            options: (value, { req }) =>
+                value === (req as IUserRegisterRequest).body.password,
+            errorMessage: "Passwords do not match",
+        },
+    },
+});
+
 export const sendOtpValidation = checkSchema({
     email: {
         exists: {
@@ -218,6 +277,37 @@ export const sendOtpValidation = checkSchema({
 });
 
 export const verifiyAccount = checkSchema({
+    email: {
+        exists: {
+            errorMessage: "Email is required",
+            bail: true,
+        },
+        trim: true,
+        notEmpty: {
+            errorMessage: "Email cannot be empty",
+            bail: true,
+        },
+        isEmail: {
+            errorMessage: "Invalid Email",
+        },
+    },
+    otp: {
+        exists: {
+            errorMessage: "OTP is required",
+            bail: true,
+        },
+        trim: true,
+        notEmpty: {
+            errorMessage: "OTP cannot be empty",
+            bail: true,
+        },
+        isString: {
+            errorMessage: "OTP should be in string type",
+        },
+    },
+});
+
+export const verifiyOtpValidation = checkSchema({
     email: {
         exists: {
             errorMessage: "Email is required",

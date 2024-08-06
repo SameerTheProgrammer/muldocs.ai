@@ -1,10 +1,12 @@
 import { NextFunction, Response } from "express";
 import {
+    IForgotPasswordRequest,
     INewPasswordRequest,
     IResendOtpRequest,
     IUpdateInfoRequest,
     IUserLoginRequest,
     IUserRegisterRequest,
+    IVerifyAccountRequest,
     IVerifyOtpRequest,
 } from "../types/auth.types";
 import { Logger } from "winston";
@@ -176,6 +178,44 @@ export class AuthController {
         }
     }
 
+    async forgotPassword(
+        req: IForgotPasswordRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        validateRequest(req, res, next);
+
+        const { email, newPassword, cpassword } = req.body;
+
+        this.logger.info("New request to forgot password", {
+            email,
+        });
+
+        if (cpassword !== newPassword) {
+            const error = createHttpError(
+                400,
+                "Confirm password should match with Password",
+            );
+            return next(error);
+        }
+
+        const user = await this.UserService.findByEmail(email);
+
+        if (!user) {
+            const error = createHttpError(400, "Account not found");
+            return next(error);
+        }
+
+        await this.UserService.updatePassword({ email, newPassword });
+
+        this.logger.info("New password created", {
+            email,
+            id: user.id,
+        });
+
+        res.status(200).json({ user });
+    }
+
     async updateProfile(
         req: IUpdateInfoRequest,
         res: Response,
@@ -223,7 +263,7 @@ export class AuthController {
     }
 
     async verifiyAccount(
-        req: IVerifyOtpRequest,
+        req: IVerifyAccountRequest,
         res: Response,
         next: NextFunction,
     ) {
@@ -256,6 +296,36 @@ export class AuthController {
         });
 
         setCookie(res, user.id);
+
+        res.status(200).json({ user });
+    }
+
+    async verifiyOtp(
+        req: IVerifyOtpRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        validateRequest(req, res, next);
+
+        const { email, otp } = req.body;
+
+        this.logger.info("New request to verify Otp", {
+            email,
+        });
+
+        const user = await this.UserService.findByEmail(email);
+
+        if (!user) {
+            const error = createHttpError(400, "Account not found");
+            return next(error);
+        }
+
+        await this.otpService.check(email, otp);
+
+        this.logger.info("Otp verified", {
+            email,
+            id: user.id,
+        });
 
         res.status(200).json({ user });
     }

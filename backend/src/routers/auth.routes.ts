@@ -10,19 +10,23 @@ import { AppDataSource } from "../config/data-source";
 import { User } from "../entity/User";
 import logger from "./../config/logger";
 import {
+    IForgotPasswordRequest,
     INewPasswordRequest,
     IResendOtpRequest,
     IUpdateInfoRequest,
     IUserLoginRequest,
     IUserRegisterRequest,
+    IVerifyAccountRequest,
     IVerifyOtpRequest,
 } from "../types/auth.types";
 import {
+    forgotPasswordValidation,
     loginValidation,
     newPasswordValidation,
     registerValidation,
     sendOtpValidation,
     updateProfileValidation,
+    verifiyOtpValidation,
 } from "../validators/auth.validator";
 import { isAuthenticated } from "../middlewares/authMiddleware";
 import { OtpService } from "./../service/Otp.Service";
@@ -79,6 +83,19 @@ router
     );
 
 router
+    .route("/forgot-password")
+    .post(
+        forgotPasswordValidation,
+        (req: Request, res: Response, next: NextFunction) => {
+            authController.forgotPassword(
+                req as IForgotPasswordRequest,
+                res,
+                next,
+            ) as unknown as RequestHandler;
+        },
+    );
+
+router
     .route("/reset-profile")
     .post(
         updateProfileValidation,
@@ -98,7 +115,7 @@ router
         updateProfileValidation,
         (req: Request, res: Response, next: NextFunction) => {
             authController.verifiyAccount(
-                req as IVerifyOtpRequest,
+                req as IVerifyAccountRequest,
                 res,
                 next,
             ) as unknown as RequestHandler;
@@ -112,6 +129,19 @@ router
         (req: Request, res: Response, next: NextFunction) => {
             authController.sendOtp(
                 req as IResendOtpRequest,
+                res,
+                next,
+            ) as unknown as RequestHandler;
+        },
+    );
+
+router
+    .route("/verify-otp")
+    .post(
+        verifiyOtpValidation,
+        (req: Request, res: Response, next: NextFunction) => {
+            authController.verifiyOtp(
+                req as IVerifyOtpRequest,
                 res,
                 next,
             ) as unknown as RequestHandler;
