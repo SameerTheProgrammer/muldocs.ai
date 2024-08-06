@@ -119,7 +119,15 @@ export class AuthController {
             this.logger.info("User logged in", { id: user.id });
 
             setCookie(res, user.id);
-            res.status(200).json({ user });
+            res.status(200).json({
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    verify: user.verify,
+                    googleId: user.googleId,
+                },
+            });
         } catch (error) {
             return next(error);
         }

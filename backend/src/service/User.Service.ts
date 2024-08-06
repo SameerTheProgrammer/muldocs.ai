@@ -63,7 +63,7 @@ export class UserService {
             where: {
                 email: email.toLowerCase(),
             },
-            select: ["id", "name", "email", "password"],
+            select: ["id", "name", "email", "password", "verify", "googleId"],
         });
     }
 
