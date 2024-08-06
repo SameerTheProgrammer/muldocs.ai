@@ -97,9 +97,15 @@ export class UserService {
 
     async updateVerify(email: string) {
         try {
-            return this.userRepository.update(email, {
-                verify: true,
-            });
+            const user = await this.findByEmail(email);
+
+            if (!user) {
+                const error = createHttpError(400, "Account not found");
+                throw error;
+            }
+
+            user.verify = true;
+            return this.userRepository.save(user);
         } catch (error) {
             const err = createHttpError(
                 400,

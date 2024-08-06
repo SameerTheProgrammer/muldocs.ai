@@ -276,7 +276,7 @@ export const sendOtpValidation = checkSchema({
     },
 });
 
-export const verifiyAccount = checkSchema({
+export const verifiyAccountValidation = checkSchema({
     email: {
         exists: {
             errorMessage: "Email is required",

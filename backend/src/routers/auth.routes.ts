@@ -26,6 +26,7 @@ import {
     registerValidation,
     sendOtpValidation,
     updateProfileValidation,
+    verifiyAccountValidation,
     verifiyOtpValidation,
 } from "../validators/auth.validator";
 import { isAuthenticated } from "../middlewares/authMiddleware";
@@ -112,7 +113,7 @@ router
 router
     .route("/verify")
     .post(
-        updateProfileValidation,
+        verifiyAccountValidation,
         (req: Request, res: Response, next: NextFunction) => {
             authController.verifiyAccount(
                 req as IVerifyAccountRequest,
