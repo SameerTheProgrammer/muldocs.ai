@@ -5,6 +5,7 @@
     "main": "src/server.ts",
     "scripts": {
         "build": "npm install && tsc",
+        "start":"node dist/server.js",
         "dev": " cross-env NODE_ENV=dev nodemon src/server.ts",
         "format:check": "prettier . --check",
         "format:fix": "prettier . --write",
